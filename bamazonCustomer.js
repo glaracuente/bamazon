@@ -16,88 +16,58 @@ connection.connect(function (err) {
     queryAll();
 });
 
-function createProduct() {
-    console.log("Inserting a new product...\n");
-    var query = connection.query(
-        "INSERT INTO products SET ?",
-        {
-            flavor: "Rocky Road",
-            price: 3.0,
-            quantity: 50
-        },
-        function (err, res) {
-            console.log(res.affectedRows + " product inserted!\n");
-            // Call updateProduct AFTER the INSERT completes
-            updateProduct();
-        }
-    );
-
-    // logs the actual query being run
-    console.log(query.sql);
-}
-
-function updateProduct() {
-    console.log("Updating all Rocky Road quantities...\n");
-    var query = connection.query(
-        "UPDATE products SET ? WHERE ?",
-        [
-            {
-                quantity: 100
-            },
-            {
-                flavor: "Rocky Road"
-            }
-        ],
-        function (err, res) {
-            console.log(res.affectedRows + " products updated!\n");
-            // Call deleteProduct AFTER the UPDATE completes
-            deleteProduct();
-        }
-    );
-
-    // logs the actual query being run
-    console.log(query.sql);
-}
-
-function deleteProduct() {
-    console.log("Deleting all strawberry icecream...\n");
-    connection.query(
-        "DELETE FROM products WHERE ?",
-        {
-            flavor: "strawberry"
-        },
-        function (err, res) {
-            console.log(res.affectedRows + " products deleted!\n");
-            // Call readProducts AFTER the DELETE completes
-            readProducts();
-        }
-    );
-}
-
-function readProducts() {
-    console.log("Selecting all products...\n");
-    connection.query("SELECT * FROM products", function (err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log(res);
-        connection.end();
-    });
-}
 
 function queryAll() {
     connection.query("SELECT * FROM products", function (err, res) {
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
+            console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].price);
         }
-        console.log("-----------------------------------");
+        console.log("-----------------------------------\n");
     });
     connection.end();
 };
 
-function queryDanceSongs() {
-    var query = connection.query("SELECT * FROM songs WHERE genre=?", ["Dance"], function (err, res) {
-        for (var i = 0; i < res.length; i++) {
-            console.log(res[i].id + " | " + res[i].title + " | " + res[i].artist + " | " + res[i].genre);
+
+//The app should then prompt users with two messages.
+//The first should ask them the ID of the product they would like to buy.
+//The second message should ask how many units of the product they would like to buy.
+
+function promptUser() {
+    inquirer
+    .prompt([
+      {
+        name: "item",
+        type: "input",
+        message: "What is the item you would like to submit?"
+      },
+      {
+        name: "startingBid",
+        type: "input",
+        message: "What would you like your starting bid to be?",
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
         }
+      }
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO auctions SET ?",
+        {
+          item_name: answer.item,
+          starting_bid: answer.startingBid,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your auction was created successfully!");
+          // re-prompt the user for if they want to bid or post
+          start();
+        }
+      );
     });
-};
+}
+
+
