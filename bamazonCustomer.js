@@ -1,5 +1,7 @@
 var mysql = require("mysql");
-var inquire = require("inquire");
+var inquirer = require("inquirer");
+var smallSpacer = "  "
+var largeSpacer = "                   "
 
 var connection = mysql.createConnection({
     //host: "localhost",
@@ -16,16 +18,19 @@ connection.connect(function (err) {
     queryAll();
 });
 
-
+//Show the ids, names, and prices of products for sale.
 function queryAll() {
     connection.query("SELECT * FROM products", function (err, res) {
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].price);
+            console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price);
         }
         console.log("-----------------------------------\n");
     });
-    connection.end();
+    //connection.end();
+    setTimeout(function(){ promptUser(); }, 200);
+    //promptUser()
 };
+
 
 
 //The app should then prompt users with two messages.
@@ -33,41 +38,37 @@ function queryAll() {
 //The second message should ask how many units of the product they would like to buy.
 
 function promptUser() {
-    inquirer
-    .prompt([
-      {
-        name: "item",
-        type: "input",
-        message: "What is the item you would like to submit?"
-      },
-      {
-        name: "startingBid",
-        type: "input",
-        message: "What would you like your starting bid to be?",
-        validate: function(value) {
-          if (isNaN(value) === false) {
-            return true;
-          }
-          return false;
-        }
-      }
-    ])
-    .then(function(answer) {
-      // when finished prompting, insert a new item into the db with that info
-      connection.query(
-        "INSERT INTO auctions SET ?",
+    inquirer.prompt([
         {
-          item_name: answer.item,
-          starting_bid: answer.startingBid,
+            name: "item_id",
+            type: "input",
+            message: "What is the ID of the product you would like to buy?",
         },
-        function(err) {
-          if (err) throw err;
-          console.log("Your auction was created successfully!");
-          // re-prompt the user for if they want to bid or post
-          start();
+        {
+            name: "units",
+            type: "input",
+            message: "How many units of this product would you like you buy?",
+            //validate: function (value) {
+            //    if (isNaN(value) === false) {
+            //        return true;
+            //    }
+            //    return false;
+            //}
         }
-      );
-    });
-}
+    ])
+        .then(function (answer) {
+            var item_id = answer.item_id;
+            var units = answer.units;
+            var query = "SELECT * FROM products WHERE item_id=" + item_id;
 
+
+            connection.query(query, function (err, res) {
+                for (var i = 0; i < res.length; i++) {
+                    console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price);
+                }
+              });
+                   // console.log("Your auction was created successfully!");
+                    // re-prompt the user for if they want to bid or post
+        });
+}
 
