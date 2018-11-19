@@ -57,14 +57,17 @@ function promptUser() {
         }
     ])
         .then(function (answer) {
-            var item_id = answer.item_id;
-            var units = answer.units;
-            var query = "SELECT * FROM products WHERE item_id=" + item_id;
+            var item_id_wanted = answer.item_id;
+            var units_wanted = answer.units;
+            var query = "SELECT * FROM products WHERE item_id=" + item_id_wanted;
 
 
             connection.query(query, function (err, res) {
                 for (var i = 0; i < res.length; i++) {
                     console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price);
+                    if (units_wanted > res[i].stock_quantity) {
+                        console.log("not enough left")
+                    }
                 }
               });
                    // console.log("Your auction was created successfully!");
