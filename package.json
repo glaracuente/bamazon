@@ -15,7 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "inquirer": "^3.0.1",
-    "mysql": "^2.13.0"
+    "mysql": "^2.13.0",
+    "moment": ""
   },
   "bugs": {
     "url": "https://github.com/glaracuente/bamazon/issues"
