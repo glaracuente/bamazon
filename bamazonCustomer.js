@@ -19,7 +19,6 @@ connection.connect(function (err) {
     displayInventory();
 });
 
-//Show the ids, names, and prices of products for sale.
 function displayInventory() {
     connection.query("SELECT * FROM products", function (err, res) {
         for (var i = 0; i < res.length; i++) {
@@ -27,17 +26,18 @@ function displayInventory() {
         }
         console.log("-----------------------------------\n");
 
-        promptUser()
+        userPurchase()
     });    
 };
 
 
-function updateProduct(id, cur_units, desired_units) {
+function updateProduct(id, new_stock_quantity, new_product_sales) {
     var query = connection.query(
         "UPDATE products SET ? WHERE ?",
         [
             {
-                stock_quantity: cur_units - desired_units
+                stock_quantity: new_stock_quantity,
+                product_sales: new_product_sales
             },
             {
                 item_id: id
@@ -48,7 +48,7 @@ function updateProduct(id, cur_units, desired_units) {
 
 
 
-function promptUser() {
+function userPurchase() {
     inquirer.prompt([
         {
             name: "item_id",
@@ -83,8 +83,10 @@ function promptUser() {
                     console.log("Insufficient stock to fulfill your request!")
                 }
                 else {
-                    updateProduct(item_id_wanted, res[0].stock_quantity, units_wanted);
                     var total_price = res[0].price * units_wanted
+                    var new_product_sales = res[0].product_sales + total_price
+                    var new_stock_quantity = res[0].stock_quantity - units_wanted
+                    updateProduct(item_id_wanted, new_stock_quantity, new_product_sales);
                     console.log("\nYour total is " + total_price + ", thank you for shopping at bAmazon =]")
                     connection.end();
                 }
@@ -92,4 +94,3 @@ function promptUser() {
 
         });
 }
-
