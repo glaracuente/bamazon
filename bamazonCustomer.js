@@ -28,10 +28,7 @@ function displayInventory() {
         console.log("-----------------------------------\n");
 
         promptUser()
-    });
-
-    //setTimeout(function () { promptUser(); }, 200);
-    
+    });    
 };
 
 

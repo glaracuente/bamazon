@@ -46,17 +46,16 @@ function promptUser() {
 
             switch (optionLetter.toUpperCase()) {
                 case 'A':
-                    return displayInventory()
-                    break;
+                    displayInventory()
+                    return connection.end()
                 case "B":
-                    return displayLowInventory()
-                    break;
+                    displayLowInventory()
+                    return connection.end()
                 case "C":
-                    return servePage("foods", req, res)
-                    break;
+                    displayInventory()
+                    return setTimeout(function () { addToInventory(); }, 200);
                 case "D":
-                    return servePage("frameworks", req, res)
-                    break;
+                    return addNewProduct()
                 default:
                     break;
             }
@@ -65,46 +64,129 @@ function promptUser() {
 }
 
 
-//Show 
 function displayInventory() {
     connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
         for (var i = 0; i < res.length; i++) {
             console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price + smallSpacer.slice(eval(res[i].price.toString().length)) + " | " + res[i].stock_quantity);
         }
         console.log("-----------------------------------\n");
     });
-    connection.end()
 };
 
-//Show 
 function displayLowInventory() {
     connection.query("SELECT * FROM products WHERE stock_quantity < 100", function (err, res) {
+        if (err) throw err;
         for (var i = 0; i < res.length; i++) {
             console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price + smallSpacer.slice(eval(res[i].price.toString().length)) + " | " + res[i].stock_quantity);
         }
         console.log("-----------------------------------\n");
     });
-    connection.end()
 };
 
 
-/*
 
+//If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
 function addToInventory() {
-    inquier.prompt the user which item, and how much more
+    inquirer.prompt([
+        {
+            name: "item_id",
+            type: "input",
+            message: "What is the ID of the product you would like to restock?",
+            validate: function (value) {
+                if (isNaN(value) === false && value !== "") {
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
+            name: "units",
+            type: "input",
+            message: "How many units of this product are you adding?",
+            validate: function (value) {
+                if (isNaN(value) === false && value !== "") {
+                    return true;
+                }
+                return false;
+            }
+        }
+    ])
+        .then(function (answer) {
+            var item_id_to_stock = answer.item_id;
+            var units_to_add = answer.units;
+            var query = "UPDATE products SET stock_quantity = stock_quantity + " + units_to_add + " WHERE item_id = " + item_id_to_stock
 
-    UPDATE stock_quantity=stock_quantity + 1 WHERE item_id=id || name=name
+            connection.query(query, function (err, res) {
+                if (err) throw err;
+                console.log("Increasing stock quanity of item " + item_id_to_stock + " by " + units_to_add + "...\n")
+                displayInventory()
+                connection.end()
+            });
+        });
 }
 
+
+
+//If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
 function addNewProduct() {
-    inquier.prompt the user for all info
+    console.log("Please fill out product info:\n")
 
-    PUT new ROW WITH GIVEN VALUES 
+    inquirer.prompt([
+        {
+            name: "product_name",
+            type: "input",
+            message: "Product Name: ",
+            validate: function (value) {
+                if (isNaN(value) === true && value.length > 2) {
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
+            name: "department_name",
+            type: "input",
+            message: "Department: ",
+            validate: function (value) {
+                if (isNaN(value) === true && value.length > 2) {
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
+            name: "price",
+            type: "input",
+            message: "Unit Price: ",
+            validate: function (value) {
+                if (isNaN(value) === false && value != "") {
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
+            name: "stock_quantity",
+            type: "input",
+            message: "Quantity: ",
+            validate: function (value) {
+                if (isNaN(value) === false && value != "") {
+                    return true;
+                }
+                return false;
+            }
+        }
+    ])
+        .then(function (answer) {
+            var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('" +
+                answer.product_name + "', '" + answer.department_name + "', '" + answer.price + "', '" + answer.stock_quantity + "')";
 
-    
+            connection.query(query, function (err, res) {
+                if (err) throw err;
+                console.log("Adding item '" + answer.product_name + "' the to '" + answer.department_name + "' department...\n")
+                displayInventory()
+                connection.end()
+            });
+        });
 }
-
-If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
-
-If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
-*/
