@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require("cli-table2");
+var departments = [];
 
 var connection = mysql.createConnection({
     //host: "localhost",
@@ -21,6 +22,7 @@ connection.connect(function (err) {
     console.log("C) Add to Inventory\n");
     console.log("D) Add New Product\n");
 
+    pullDepartments();
     promptUser()
 });
 
@@ -66,7 +68,7 @@ function promptUser() {
 function displayInventory() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
-        var table = new Table({head:['item_id','product_name','price','stock_quantity']});
+        var table = new Table({ head: ['item_id', 'product_name', 'price', 'stock_quantity'] });
         for (var i = 0; i < res.length; i++) {
             table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
         }
@@ -74,10 +76,32 @@ function displayInventory() {
     });
 };
 
+/*function verifyDepartment(department) {
+    connection.query("SELECT department_name FROM products GROUP BY department_name", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            if (department === res[i].department_name) {
+                console.log("true")
+                return true
+            }
+        }
+        return false
+    });
+};*/
+
+function pullDepartments() {
+    connection.query("SELECT department_name FROM products GROUP BY department_name", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            departments.push(res[i].department_name)
+        }
+    });
+};
+
 function displayLowInventory() {
     connection.query("SELECT * FROM products WHERE stock_quantity < 100", function (err, res) {
         if (err) throw err;
-        var table = new Table({head:['item_id','product_name','price','stock_quantity']});
+        var table = new Table({ head: ['item_id', 'product_name', 'price', 'stock_quantity'] });
         for (var i = 0; i < res.length; i++) {
             table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
         }
@@ -146,14 +170,14 @@ function addNewProduct() {
             }
         },
         {
-            name: "department_name", // AN IMPROVEMENT WOULD BE TO VALIDATE THAT DEPARTMENT EXISTS IN departments TABLE
+            name: "department_name",
             type: "input",
             message: "Department: ",
             validate: function (value) {
-                if (isNaN(value) === true && value.length > 2) {
-                    return true;
+                if (departments.indexOf(value) === -1) { // AN IMPROVEMENT WOULD BE TO use the verifyDepartment function, but need to figure out race condition
+                    return false;
                 }
-                return false;
+                return true;
             }
         },
         {
