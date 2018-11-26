@@ -2,7 +2,7 @@
 
 **bAmazon** 
 
-This is a Node.JS app that interacts with a MySQL server on the localhost. The seeds.sql and schema.sql files can be used to get your local MySQL server set up to get the application set up for testing. 
+This is a Node.JS app that interacts with a MySQL server on the localhost. The seeds.sql and schema.sql files can be used to get your local MySQL server set up for testing. 
 
 **bAmazon - This is a wrapper script that allows the user to choose between the different views: Customer, Manager, and Supervisor.**
 
