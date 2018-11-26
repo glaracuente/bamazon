@@ -1,10 +1,10 @@
 
 
-** bAmazon ** 
+**bAmazon** 
 
 This is a Node.JS app that interacts with a MySQL server on the localhost. The seeds.sql and schema.sql files can be used to get your local MySQL server set up for testing. 
 
-** bAmazon - This is a wrapper script that allows the user to choose between the different views: Customer, Manager, and Supervisor. **
+**bAmazon - This is a wrapper script that allows the user to choose between the different views: Customer, Manager, and Supervisor.**
 
 ```
 # node bAmazon.js
@@ -60,7 +60,7 @@ Your total is 800, thank you for shopping at bAmazon =]
 ```
 
 
-**bamazonManager - The manager view allows the user to view all products for sale, with the additional stock_quantity info. The manager can also view the inventory of items with less than 100 units in stock. They can add more stock of any item, or add a brand new item. **
+**bamazonManager - The manager view allows the user to view all products for sale, with the additional stock_quantity info. The manager can also view the inventory of items with less than 100 units in stock. They can add more stock of any item, or add a brand new item.**
 
 ```
 #node bamazonManager.js
@@ -89,7 +89,7 @@ D) Add New Product
 └─────────┴──────────────┴───────┴────────────────┘
 ```
 
-**bamazonSupervisor - The supervisor view allows the user to view each department along with the product sales and total profit. They can also create a new department. **
+**bamazonSupervisor - The supervisor view allows the user to view each department along with the product sales and total profit. They can also create a new department.**
 
 ```
 #node bamazonSupervisor.js
