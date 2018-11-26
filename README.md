@@ -119,12 +119,12 @@ B) Create New Department
 ```
 
 **Technologies Used:**
-Javascript
-nodeJS
-MySQL
+* Javascript
+* nodeJS
+* MySQL
 
 **npm packages:**
-mysql
-inquirer
-cli-table2
-moment
+* mysql
+* inquirer
+* cli-table2
+* moment
