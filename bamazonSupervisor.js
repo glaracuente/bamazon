@@ -1,7 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var smallSpacer = "      "
-var largeSpacer = "                   "
+var Table = require("cli-table2");
 
 var connection = mysql.createConnection({
     //host: "localhost",
@@ -43,11 +42,9 @@ function promptUser() {
 
             switch (optionLetter.toUpperCase()) {
                 case 'A':
-                    viewProductSales()
-                    return connection.end()
+                    return viewProductSales()
                 case "B":
-                    createNewDepartment()
-                    return connection.end()
+                    return createNewDepartment()
                 default:
                     break;
             }
@@ -56,9 +53,58 @@ function promptUser() {
 }
 
 function viewProductSales() {
-    console.log("view product sales")
+    var query = "select d.department_id,d.department_name,d.over_head_costs,SUM(p.product_sales) AS product_sales,(SUM(p.product_sales) - d.over_head_costs) AS total_profit from departments as d LEFT JOIN products as p ON d.department_name = p.department_name GROUP BY d.department_id,d.department_name;";
+
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        var table = new Table({head:['department_id','department_name','over_head_costs','product_sales','total_profit']});
+        for (var i = 0; i < res.length; i++) {
+            table.push([res[i].department_id, res[i].department_name, res[i].over_head_costs, res[i].product_sales, res[i].total_profit]);
+        }
+        console.log(table.toString());
+        connection.end()
+    });
+
+
+
 }
 
-function createNewDepartment(){
-    console.log("create new department")
+function createNewDepartment() {
+    no
+    console.log("Please fill out new department info:\n")
+
+    inquirer.prompt([
+        {
+            name: "department_name",
+            type: "input",
+            message: "Department Name: ",
+            validate: function (value) {
+                if (isNaN(value) === true && value.length > 2) {
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
+            name: "over_head_costs",
+            type: "input",
+            message: "Overhead Costs: ",
+            validate: function (value) {
+                if (isNaN(value) === false && value != "") {
+                    return true;
+                }
+                return false;
+            }
+        }
+    ])
+        .then(function (answer) {
+            var query = "INSERT INTO departments (department_name, over_head_costs) VALUES ('" +
+                answer.department_name + "', '" + answer.over_head_costs + "')";
+
+            connection.query(query, function (err, res) {
+                if (err) throw err;
+                console.log("Adding new department '" + answer.department_name + "'...\n")
+                connection.end()
+            });
+        });
 }

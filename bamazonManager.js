@@ -1,7 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var smallSpacer = "      "
-var largeSpacer = "                   "
+var Table = require("cli-table2");
 
 var connection = mysql.createConnection({
     //host: "localhost",
@@ -67,20 +66,22 @@ function promptUser() {
 function displayInventory() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
+        var table = new Table({head:['item_id','product_name','price','stock_quantity']});
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price + smallSpacer.slice(eval(res[i].price.toString().length)) + " | " + res[i].stock_quantity);
+            table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
         }
-        console.log("-----------------------------------\n");
+        console.log(table.toString());
     });
 };
 
 function displayLowInventory() {
     connection.query("SELECT * FROM products WHERE stock_quantity < 100", function (err, res) {
         if (err) throw err;
+        var table = new Table({head:['item_id','product_name','price','stock_quantity']});
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + smallSpacer.slice(eval(res[i].item_id.toString().length)) + " | " + res[i].product_name + largeSpacer.slice(eval(res[i].product_name.length)) + " | " + res[i].price + smallSpacer.slice(eval(res[i].price.toString().length)) + " | " + res[i].stock_quantity);
+            table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
         }
-        console.log("-----------------------------------\n");
+        console.log(table.toString());
     });
 };
 
@@ -130,7 +131,7 @@ function addToInventory() {
 
 //If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
 function addNewProduct() {
-    console.log("Please fill out product info:\n")
+    console.log("Please fill out new product info:\n")
 
     inquirer.prompt([
         {
@@ -145,7 +146,7 @@ function addNewProduct() {
             }
         },
         {
-            name: "department_name",
+            name: "department_name", // AN IMPROVEMENT WOULD BE TO VALIDATE THAT DEPARTMENT EXISTS IN departments TABLE
             type: "input",
             message: "Department: ",
             validate: function (value) {

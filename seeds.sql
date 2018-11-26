@@ -10,5 +10,11 @@ VALUES ("xbox", "video games", 400, 40),
 ("windex", "cleaning products", 4.99, 120),
 ("detergent", "cleaning products", 12.99, 230);
 
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("video games", 20000.00), 
+("sports", 10000.00), 
+("electronics", 30000.00),
+("cleaning products", 5000.00);
+
 select * from products;
 

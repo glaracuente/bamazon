@@ -14,9 +14,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cli-table2": "^0.2.0",
     "inquirer": "^3.0.1",
-    "mysql": "^2.13.0",
-    "moment": ""
+    "moment": "",
+    "mysql": "^2.13.0"
   },
   "bugs": {
     "url": "https://github.com/glaracuente/bamazon/issues"
